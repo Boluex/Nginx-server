@@ -1,0 +1,31 @@
+services:
+    web:
+        build: 
+           context: ./nginx/
+        ports:
+          - 80:80
+        volumes:
+        #    - ./nginx/html/:/usr/share/nginx/html/
+           - ./nginx/conf.d/:/etc/nginx/conf.d/
+           - ./todo_proj/staticfiles/:/home/app/staticfiles/
+    django:
+        build:
+            context: ./todo_proj/
+        command: gunicorn todo_proj.wsgi:application --bind 0.0.0.0:8000
+        volumes:
+            - ./todo_proj/:/usr/src/app
+            # - staticfiles:/usr/src/staicfiles
+        expose:
+          - 8000
+
+    dns:
+        build:
+           context: ./dns/
+        restart: always
+        ports:
+            - "5354:53"
+            - "5354:53/udp"
+        volumes:
+            - ./dns/named.conf/named.conf:/etc/bind/named.conf
+            - ./dns/zone/:/etc/bind/zone/
+        command: named -c /etc/bind/named.conf -g -u bind

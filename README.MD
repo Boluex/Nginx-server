@@ -1,0 +1,1 @@
+An nginx server using docker,nginx,django,dns 
